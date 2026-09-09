@@ -1,6 +1,3 @@
-Yes. I checked the current implementation of StandardImpedanceLib usage in VitafitVT701Handler, and the exact import/API is now verified. �
-GitHub
-Replace your handler with this version:
 /*
  * openScale
  *
@@ -30,6 +27,11 @@ import com.health.openscale.R
 import com.health.openscale.core.bluetooth.data.ScaleMeasurement
 import com.health.openscale.core.bluetooth.data.ScaleUser
 import com.health.openscale.core.bluetooth.libs.StandardImpedanceLib
+import com.health.openscale.core.data.Kcal
+import com.health.openscale.core.data.Kg
+import com.health.openscale.core.data.MeasurementType
+import com.health.openscale.core.data.Ohm
+import com.health.openscale.core.data.Percent
 import com.health.openscale.core.service.ScannedDeviceInfo
 import java.util.Date
 import java.util.UUID
@@ -194,7 +196,7 @@ class DzcScaleHandler : ScaleDeviceHandler() {
         val measurement = ScaleMeasurement().apply {
             userId = user.id
             dateTime = Date()
-            weight = weightKg
+            this[MeasurementType.WEIGHT] = Kg(weightKg)
         }
 
         /*
@@ -206,7 +208,7 @@ class DzcScaleHandler : ScaleDeviceHandler() {
             impedanceOhm >= MIN_VALID_IMPEDANCE &&
             impedanceOhm < MAX_VALID_IMPEDANCE
         ) {
-            measurement.impedance = impedanceOhm.toDouble()
+            measurement[MeasurementType.IMPEDANCE] = Ohm(impedanceOhm)
 
             val lib = StandardImpedanceLib(
                 gender = user.gender,
@@ -216,27 +218,27 @@ class DzcScaleHandler : ScaleDeviceHandler() {
                 impedance = impedanceOhm.toDouble()
             )
 
-            measurement.fat =
-                lib.totalFatPercentage.toFloat()
+            measurement[MeasurementType.BODY_FAT] =
+                Percent(lib.totalFatPercentage.toFloat())
 
-            measurement.water =
-                lib.totalBodyWaterPercentage.toFloat()
+            measurement[MeasurementType.WATER] =
+                Percent(lib.totalBodyWaterPercentage.toFloat())
 
-            measurement.muscle =
-                lib.skeletalMusclePercentage.toFloat()
+            measurement[MeasurementType.MUSCLE] =
+                Percent(lib.skeletalMusclePercentage.toFloat())
 
-            measurement.bone =
-                lib.boneMassKg.toFloat()
+            measurement[MeasurementType.BONE] =
+                Kg(lib.boneMassKg.toFloat())
 
-            measurement.bmr =
-                lib.basalMetabolicRate.toFloat()
+            measurement[MeasurementType.BMR] =
+                Kcal(lib.basalMetabolicRate.toFloat())
 
             logI(
                 "DZC body composition: " +
-                    "fat=${measurement.fat}%, " +
-                    "water=${measurement.water}%, " +
-                    "muscle=${measurement.muscle}%, " +
-                    "bone=${measurement.bone} kg"
+                    "fat=${lib.totalFatPercentage}%, " +
+                    "water=${lib.totalBodyWaterPercentage}%, " +
+                    "muscle=${lib.skeletalMusclePercentage}%, " +
+                    "bone=${lib.boneMassKg} kg"
             )
         } else {
             logD(
@@ -253,24 +255,3 @@ class DzcScaleHandler : ScaleDeviceHandler() {
         requestDisconnect()
     }
 }
-What changed
-The important new import is:
-import com.health.openscale.core.bluetooth.libs.StandardImpedanceLib
-And the new calculation flow is:
-DZC Scale
-   ↓
-Weight = 85.30 kg
-Impedance = 534 Ω
-   ↓
-StandardImpedanceLib
-   ↓
-Fat %
-Water %
-Muscle %
-Bone mass
-BMR
-   ↓
-publish()
-I also added a published guard. That prevents multiple stabilized packets from creating duplicate measurements if the scale repeats its final 0x01 frame.
-This implementation follows the same current openScale pattern used by VitafitVT701Handler for a scale that supplies weight plus raw impedance and relies on StandardImpedanceLib for derived body metrics. �
-GitHub
