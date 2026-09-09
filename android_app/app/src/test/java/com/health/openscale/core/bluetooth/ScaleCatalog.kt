@@ -32,6 +32,7 @@ import com.health.openscale.core.bluetooth.scales.CustomOpenScaleHandler
 import com.health.openscale.core.bluetooth.scales.DeviceCapability
 import com.health.openscale.core.bluetooth.scales.DigooDGSO38HHandler
 import com.health.openscale.core.bluetooth.scales.DrTrustSSW532Handler
+import com.health.openscale.core.bluetooth.scales.DzcScaleHandler
 import com.health.openscale.core.bluetooth.scales.EEBBLHandler
 import com.health.openscale.core.bluetooth.scales.ESCS20MHandler
 import com.health.openscale.core.bluetooth.scales.EbelterBodyFatB2Handler
@@ -285,6 +286,7 @@ object ScaleCatalog {
         device("1BODY CONNECT") claimedBy BodyConnectHandler::class.java,
         device("1X-LINE") claimedBy BodyConnectHandler::class.java,
         device("10376BAA") claimedBy WeightGurusA3Handler::class.java,
+        device("DZC-D18E3") claimedBy DzcScaleHandler::class.java,
 
         // Omron reports its model as the GAP name once bonded; advertised local names carry the
         // model id instead (see OmronWlcHandler.MODELS_BY_ADVERTISED_ID).
