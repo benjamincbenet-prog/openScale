@@ -1,9 +1,9 @@
 package com.health.openscale.core.bluetooth.scales
 
 import com.health.openscale.R
-import com.health.openscale.core.bluetooth.data.DeviceCapability
-import com.health.openscale.core.bluetooth.data.DeviceSupport
-import com.health.openscale.core.bluetooth.data.LinkMode
+import com.health.openscale.core.bluetooth.DeviceCapability
+import com.health.openscale.core.bluetooth.DeviceSupport
+import com.health.openscale.core.bluetooth.LinkMode
 import com.health.openscale.core.bluetooth.data.ScaleMeasurement
 import com.health.openscale.core.bluetooth.data.ScaleUser
 import com.health.openscale.core.service.ScannedDeviceInfo
@@ -73,8 +73,8 @@ class DzcScaleHandler : ScaleDeviceHandler() {
         val isStabilized = (data[8].toInt() and 0xFF) == 0x01
 
         val measurement = ScaleMeasurement().apply {
-            weight = weightKg
-            fatResistance = impedance.toInt()
+            setWeight(weightKg)
+            setFatResistance(impedance.toInt())
         }
 
         if (isStabilized) {
