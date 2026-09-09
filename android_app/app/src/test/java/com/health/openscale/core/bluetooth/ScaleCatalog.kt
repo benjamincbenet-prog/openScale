@@ -32,6 +32,7 @@ import com.health.openscale.core.bluetooth.scales.CustomOpenScaleHandler
 import com.health.openscale.core.bluetooth.scales.DeviceCapability
 import com.health.openscale.core.bluetooth.scales.DigooDGSO38HHandler
 import com.health.openscale.core.bluetooth.scales.DrTrustSSW532Handler
+import com.health.openscale.core.bluetooth.scales.DzcScaleHandler
 import com.health.openscale.core.bluetooth.scales.EEBBLHandler
 import com.health.openscale.core.bluetooth.scales.ESCS20MHandler
 import com.health.openscale.core.bluetooth.scales.EbelterBodyFatB2Handler
@@ -233,6 +234,7 @@ object ScaleCatalog {
         device("Shape200") claimedBy SoehnleHandler::class.java,
         device("Weight Scale") claimedBy SinocareHandler::class.java,
         device("SENSSUN FAT") claimedBy SenssunHandler::class.java,
+        device("DZC-D18E3") claimedBy DzcScaleHandler::class.java,
         // No QN service advertised, so the QN driver must not take it.
         device("RENPHO-SCALE-1234") claimedBy RenphoHandler::class.java,
         device("QN-Scale", uuid16(0xFFE0)) claimedBy QNHandler::class.java,
