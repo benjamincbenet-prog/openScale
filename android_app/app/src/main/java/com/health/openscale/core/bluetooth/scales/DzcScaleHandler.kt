@@ -34,7 +34,7 @@ class DzcScaleHandler : ScaleDeviceHandler() {
     }
 
     override fun onConnected(user: ScaleUser) {
-        logI("Connected to DZC scale. Enabling notifications on 0xFFF4.")
+        logI("Starting connection sequence for DZC scale.")
         setNotifyOn(SERVICE_UUID, NOTIFY_CHAR_UUID)
         userInfo(R.string.bt_info_step_on_scale)
     }
@@ -44,12 +44,14 @@ class DzcScaleHandler : ScaleDeviceHandler() {
             return
         }
 
+        logD("Measurement data received: ${data.toHexPreview(24)}")
+
         // Validate Header (0xCF)
         if ((data[0].toInt() and 0xFF) != 0xCF) {
             return
         }
 
-        // Validate Checksum (XOR bytes 0..9)
+        // Validate XOR Checksum across bytes 0..9
         var checksum = 0
         for (i in 0..9) {
             checksum = checksum xor (data[i].toInt() and 0xFF)
@@ -59,7 +61,7 @@ class DzcScaleHandler : ScaleDeviceHandler() {
             return
         }
 
-        // Extract Weight: Bytes 3..4 (uint16 little-endian / 100)
+        // Extract Weight: Bytes 3..4 (uint16 little-endian / 100) -> openScale expects kg
         val rawWeight = ((data[4].toInt() and 0xFF) shl 8) or (data[3].toInt() and 0xFF)
         val weightKg = rawWeight / 100.0f
 
@@ -71,12 +73,14 @@ class DzcScaleHandler : ScaleDeviceHandler() {
         val isStabilized = (data[8].toInt() and 0xFF) == 0x01
 
         val measurement = ScaleMeasurement().apply {
-            setWeight(weightKg)
-            setFatResistance(impedance.toInt())
+            weight = weightKg
+            fatResistance = impedance.toInt()
         }
 
         if (isStabilized) {
-            addScaleMeasurement(measurement)
+            logI("Stable weight measurement ($weightKg kg) received. Publishing to app.")
+            publish(measurement)
+            requestDisconnect()
         }
     }
 }
