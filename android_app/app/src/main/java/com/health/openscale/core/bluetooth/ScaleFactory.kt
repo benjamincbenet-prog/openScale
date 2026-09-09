@@ -19,6 +19,7 @@ package com.health.openscale.core.bluetooth
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
+import com.health.openscale.core.bluetooth.scales.DzcScaleHandler
 import com.health.openscale.core.bluetooth.scales.HealthKeep280Handler
 import com.health.openscale.core.bluetooth.scales.BeurerBF450Handler
 import com.health.openscale.core.bluetooth.scales.ScaleDeviceHandler
@@ -203,6 +204,7 @@ class ScaleFactory @Inject constructor(
             ScaleupHandler(),
             BodyConnectHandler(),
             WeightGurusA3Handler(),
+            DzcScaleHandler(),
         )
     }
 
